@@ -21,8 +21,8 @@ module.exports = {
     EnvConfig: {
         host: hostIp,
         port: 3000,
-        serverHost: '192.168.1.49', //Replace this with main pouch db server ip
-        serverPort: 3231,
+        serverHost: hostIp, //Replace this with main pouch db server ip
+        serverPort: 3001,
         serverDbName: 'live'
     }
 };
