@@ -1,0 +1,29 @@
+{
+  "name": "pouch_db_dev",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "es2015": "0.0.0",
+    "express": "^4.16.3",
+    "express-ejs-extend": "0.0.1",
+    "node-run-cmd": "^1.0.1",
+    "pouchdb": "^7.0.0",
+    "pouchdb-adapter-memory": "^7.0.0",
+    "pouchdb-browser": "^7.0.0",
+    "pouchdb-server": "^4.0.1",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "http": "0.0.0"
+  }
+}

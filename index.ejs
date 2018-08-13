@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+    </head>
+    <script>
+
+        var host = `<%= host %>`;
+        var port = <%= port %>;
+        var active=false
+        var socket = io('http://'+host+':'+<%= port %>); 
+        
+        socket.on('change', function(data){
+            actionData(data.data.change.docs)
+        })
+        socket.on('event', function(data){
+            console.log('event',data)
+        })
+        function getAll(result)
+        {
+            var trhtml='';
+            result.map(function(data,index){
+
+                trhtml +='<tr id="'+data.doc._id+'">'+
+                            '<td>'+data.doc.title+'</td>'+
+                            '<td>'+data.doc.group+'</td>'+
+                            '<td ><button onclick="deleteDoc(\''+data.doc._id+'\')">Delete</button></td>'+
+                        '<tr>';
+
+            })
+            document.getElementById("myList").innerHTML=trhtml;
+        }
+
+        function actionData(result)
+        {   
+            result.map(function(data,index){
+
+                if(data._deleted)
+                {
+                    if( $( "#myList" ).find( '#'+data._id ).length ==1)
+                    document.getElementById(data._id).remove()
+                }
+                else if( $( "#myList" ).find( '#'+data._id ).length !=1)
+                {   
+                    var trhtml ='<tr id="'+data._id+'">'+
+                                    '<td>'+data.title+'</td>'+
+                                    '<td>'+data.group+'</td>'+
+                                    '<td ><button onclick="deleteDoc(\''+data._id+'\')">Delete</button></td>'+
+                                '<tr>';
+                    $( "#myList" ).prepend( trhtml );
+                }
+            })
+        }
+
+        function deleteDoc(id)
+        {
+            $.ajax({
+                type:'post',
+                url:'http://'+host+':'+port+'/delete-row',
+                data:{id:id},
+                dataType:'JSON',
+                success: function(result){
+                    console.log('deleteDoc',result.id)
+                    document.getElementById(result.id).remove()
+                }
+            })
+        }
+        
+        $(function(){
+            $('.submit').on('submit', function(event){
+
+                event.preventDefault();
+
+                var data={
+                    'title':document.getElementById('title').value,
+                    'group':document.getElementById('group').value
+                }
+                      
+                $.ajax({
+                    type:'POST',
+                    url:'http://'+host+':'+port+'/create',
+                    data:data,
+                    dataType:'JSON',
+                    success: function(result){ 
+                        actionData([{
+                            _id:result.id,
+                            'title':document.getElementById('title').value,
+                            'group':document.getElementById('group').value,
+                            }])
+
+                    }
+                })
+            })
+        }) 
+
+        $.ajax({
+            type:'post',
+            url:'http://'+host+':'+port+'/view',
+            dataType:'JSON',
+            success: function(result){getAll(result)}
+        })
+    </script>
+    <body>
+    <div class="container">
+      <form class="submit" >
+        <div class="form-group">
+          <label for="email">Title:</label>
+          <input type="text" class="form-control" name="title" id="title" required="required">
+        </div>
+        <div class="form-group">
+          <label for="pwd">Group:</label>
+          <input type="text" class="form-control" name="group" id="group" required="required">
+        </div>
+        <div class="form-group">
+          <button  class="btn btn-success" >Create</button>
+          <!-- <button  id="viewDoc" onclick="viewDoc()">View</button> -->
+        </div>
+      </form>
+        
+      <div class="center">
+        <table class="table table-striped" >
+           <thead>
+             <tr>
+              <th>Title</th>
+              <th>Group</th>
+              <th>Action</th>
+             </tr>
+          </thead>
+          <tbody id="myList">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
