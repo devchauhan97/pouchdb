@@ -20,9 +20,9 @@ Object.keys(ifaces).forEach(function (ifname) {
 module.exports = {
     EnvConfig: {
         host: hostIp,
-        port: 3000,
+        port: 7000,
         serverHost: hostIp, //Replace this with main pouch db server ip
-        serverPort: 3001,
+        serverPort: 9000,
         serverDbName: 'live'
     }
 };

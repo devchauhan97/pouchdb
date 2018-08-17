@@ -67,30 +67,10 @@ const socket_server = app.listen(config.EnvConfig.port, config.EnvConfig.host, f
 
 const io = require('socket.io').listen(socket_server);
 
-
 PouchDB.sync('hesta_db', `http://${config.EnvConfig.serverHost}:${config.EnvConfig.serverPort}/${config.EnvConfig.serverDbName}`, {
     live: true,
     retry: true
 }).on('change', function (info) {
      io.emit('change', {data: info});
-      io.emit('event', 'changed');
-}).on('paused', function (err) {
-    io.emit('event', 'paused');
-    // replication paused (e.g. replication up to date, user went offline)
-}).on('active', function () {
-    io.emit('event', 'active');
-    // replicate resumed (e.g. new changes replicating, user went back online)
-}).on('denied', function (err) {
-    io.emit('event', 'denied');
-    // a document failed to replicate (e.g. due to permissions)
-}).on('complete', function (info) {
-     io.emit('event', 'complete');
-    // handle complete
-}).on('error', function (err) {
-    // handle error
-    io.emit('event', 'error');
-    console.log('error')
 });
-
-
 module.exports = app;

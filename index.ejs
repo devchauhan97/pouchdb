@@ -9,24 +9,51 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
     </head>
+    <body>
+    <div class="container">
+      <form class="submit" id="contactDetails" >
+        <div class="form-group">
+          <label for="email">Title:</label>
+          <input type="text" class="form-control" name="title" id="title" required="required">
+        </div>
+        <div class="form-group">
+          <label for="pwd">Group:</label>
+          <input type="text" class="form-control" name="group" id="group" required="required">
+        </div>
+        <div class="form-group">
+          <button  class="btn btn-success">Create</button>
+        </div>
+      </form>
+        
+      <div class="center">
+        <table class="table table-striped" >
+           <thead>
+             <tr>
+              <th>Title</th>
+              <th>Group</th>
+              <th>Action</th>
+             </tr>
+          </thead>
+          <tbody id="myList">
+          </tbody>
+        </table>
+      </div>
+    </div>
     <script>
+        var contactDetailsForm = document.getElementById('contactDetails');
 
         var host = `<%= host %>`;
         var port = <%= port %>;
         var active=false
         var socket = io('http://'+host+':'+<%= port %>); 
-        
         socket.on('change', function(data){
             actionData(data.data.change.docs)
         })
-        socket.on('event', function(data){
-            console.log('event',data)
-        })
+
         function getAll(result)
         {
             var trhtml='';
             result.map(function(data,index){
-
                 trhtml +='<tr id="'+data.doc._id+'">'+
                             '<td>'+data.doc.title+'</td>'+
                             '<td>'+data.doc.group+'</td>'+
@@ -66,39 +93,32 @@
                 data:{id:id},
                 dataType:'JSON',
                 success: function(result){
-                    console.log('deleteDoc',result.id)
+                    
                     document.getElementById(result.id).remove()
                 }
             })
         }
-        
-        $(function(){
-            $('.submit').on('submit', function(event){
-
-                event.preventDefault();
-
-                var data={
-                    'title':document.getElementById('title').value,
-                    'group':document.getElementById('group').value
+        contactDetailsForm.addEventListener('submit', event => {
+            event.preventDefault();
+            var data={
+                'title':document.getElementById('title').value,
+                'group':document.getElementById('group').value
+            }
+                 
+            $.ajax({
+                type:'POST',
+                url:'http://'+host+':'+port+'/create',
+                data:data,
+                dataType:'JSON',
+                success: function(result){ 
+                    actionData([{
+                        _id:result.id,
+                        'title':document.getElementById('title').value,
+                        'group':document.getElementById('group').value,
+                        }])
                 }
-                      
-                $.ajax({
-                    type:'POST',
-                    url:'http://'+host+':'+port+'/create',
-                    data:data,
-                    dataType:'JSON',
-                    success: function(result){ 
-                        actionData([{
-                            _id:result.id,
-                            'title':document.getElementById('title').value,
-                            'group':document.getElementById('group').value,
-                            }])
-
-                    }
-                })
             })
-        }) 
-
+        });
         $.ajax({
             type:'post',
             url:'http://'+host+':'+port+'/view',
@@ -106,36 +126,5 @@
             success: function(result){getAll(result)}
         })
     </script>
-    <body>
-    <div class="container">
-      <form class="submit" >
-        <div class="form-group">
-          <label for="email">Title:</label>
-          <input type="text" class="form-control" name="title" id="title" required="required">
-        </div>
-        <div class="form-group">
-          <label for="pwd">Group:</label>
-          <input type="text" class="form-control" name="group" id="group" required="required">
-        </div>
-        <div class="form-group">
-          <button  class="btn btn-success" >Create</button>
-          <!-- <button  id="viewDoc" onclick="viewDoc()">View</button> -->
-        </div>
-      </form>
-        
-      <div class="center">
-        <table class="table table-striped" >
-           <thead>
-             <tr>
-              <th>Title</th>
-              <th>Group</th>
-              <th>Action</th>
-             </tr>
-          </thead>
-          <tbody id="myList">
-          </tbody>
-        </table>
-      </div>
-    </div>
   </body>
 </html>
