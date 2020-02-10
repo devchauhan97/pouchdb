@@ -1,5 +1,5 @@
 
-# Create Offline  Distributed System Web Apps Using  PouchDB
+# Create Offline  Distributed System Web Application Using  PouchDB
 
 Dharmender chauhan teaches you to build offline web apps using  PouchDB to store data locally and sync to a PouchDB DB.
 
